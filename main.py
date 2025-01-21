@@ -1,0 +1,1 @@
+"""Application starting point"""
