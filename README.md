@@ -25,7 +25,7 @@ Shadowing App is a work-in-progress application designed to assist users in lear
 - **PyInstaller**: Packaging the application into an executable file.
 
 ## Development Roadmap
-1. **Set Up Environment**: 
+1. **Set Up Environment**:
    - Define project structure.
    - Install necessary libraries (`kivy`, `sqlalchemy`, `pytest`).
 
