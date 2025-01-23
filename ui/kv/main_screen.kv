@@ -1,0 +1,139 @@
+#:kivy 2.0.0
+<MainScreen>:
+    id: main_screen
+
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+
+        padding: 50
+        spacing: 50
+
+        BoxLayout:
+            orientation: "horizontal"
+            Button:
+                text: "Choose a file"
+                on_press: main_screen.choose_file()
+
+            Button:
+                text: "Read a file"
+                # disabled: True
+                on_press: root.go_to_patch_list()
+
+        Label:
+            id: info_label
+            text: "When you choose the file, the button start will be enabled"
+        Button:
+            id: play_button
+            text: "Play"
+            on_press: main_screen.play()
+
+
+<FileChooser>:
+    id: file_chooser_screen
+
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: 50
+        spacing: 50
+
+        FileChooserIconView:
+            id: file_chooser
+            size_hint_y: 0.7
+            filters: ["*.mp3", "*.wav", "*.ogg"]
+            on_selection: file_chooser_screen.selected(file_chooser.selection)
+
+        Label:
+            id: selected_label
+            size_hint_y: 0.1
+            height: 50
+
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.1
+
+            Button:
+                text: "Choose"
+                on_press: file_chooser_screen.choose()
+                disabled: not file_chooser.selection
+
+            Button:
+                text: "Cancel"
+                on_press: file_chooser_screen.cancel()
+
+<PlayAudioScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: 10
+        spacing: 10
+
+        Label:
+            id: title
+            text: "Audio Player"
+            size_hint_y: 0.1
+            height: 40
+
+        Slider:
+            id: progress_bar
+            size_hint_y: 0.3
+            min: 0
+            max: 1  # It will be updated when the audio is loaded
+            value: 0
+            height: 30  # Ustaw wysokość slidera
+            on_touch_down: if self.collide_point(*args[1].pos): root.seek(self.value)
+            on_touch_move: if self.collide_point(*args[1].pos): root.seek(self.value)
+            on_touch_up: print("HERHEHEH")
+
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.2
+            height: 40
+
+            Label:
+                id: current_time
+                text: "00:00"
+                size_hint_x: None
+                width: 60
+
+            Label:
+                text: "/"
+
+            Label:
+                id: total_time
+                text: "00:00"
+                size_hint_x: None
+                width: 60
+
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.2
+            height: 40
+
+            Button:
+                text: "Reverse"
+
+            Button:
+                text: "Pause"
+                on_press: root.pause()
+
+            Button:
+                text: "Play"
+                on_press: root.play()
+
+            Button:
+                text: "Time Stamp"
+
+            Button:
+                text: "Next"
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.1
+            height: 40
+
+            Button:
+                text: "Back"
+                on_press: root.back()
+
+            Button:
+                text: "Save"
