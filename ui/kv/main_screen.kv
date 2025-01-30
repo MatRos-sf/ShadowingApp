@@ -12,10 +12,12 @@
         BoxLayout:
             orientation: "horizontal"
             Button:
+                id: choose_file_button
                 text: "Choose a file"
-                on_press: main_screen.choose_file()
+                on_press: root.choose_file()
 
             Button:
+                id: read_file_button
                 text: "Read a file"
                 # disabled: True
                 on_press: main_screen.read_file()
@@ -54,11 +56,13 @@
             size_hint_y: 0.1
 
             Button:
+                id: choose_button
                 text: "Choose"
                 on_press: file_chooser_screen.choose()
                 disabled: not file_chooser.selection
 
             Button:
+                id: cancel_button
                 text: "Cancel"
                 on_press: file_chooser_screen.cancel()
 
@@ -97,6 +101,7 @@
                 width: 60
 
             Label:
+                id: separator
                 text: "/"
 
             Label:
@@ -111,20 +116,25 @@
             height: 40
 
             Button:
+                id: reverse_button
                 text: "Reverse"
 
             Button:
+                id: pause_button
                 text: "Pause"
                 on_press: root.pause()
 
             Button:
+                id: play_button
                 text: "Play"
                 on_press: root.play()
 
             Button:
+                id: time_stamp_button
                 text: "Time Stamp"
 
             Button:
+                id: next_button
                 text: "Next"
         BoxLayout:
             orientation: "horizontal"
@@ -132,10 +142,12 @@
             height: 40
 
             Button:
+                id: back_button
                 text: "Back"
                 on_press: root.back()
 
             Button:
+                id: save_button
                 text: "Save"
 
 <ReadFileScreen>:
