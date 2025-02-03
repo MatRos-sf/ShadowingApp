@@ -4,10 +4,13 @@ from typing import Optional
 
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
+from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen
+
+from utils.enums import KeyboardEnum
 
 SAMPLE_FILES_PATH = [
     "/home/user/documents",
@@ -123,6 +126,9 @@ class PlayAudioScreen(Screen):
         self.sound: Optional[SoundLoader] = None
         self.update_event = None  # Event dla aktualizacji slidera
         self.current_position = 0
+        self._time_stamp = [0]
+        self._time_stamp_index = 0
+        Window.bind(on_key_down=self.on_key_press)
 
     def on_enter(self, *args):
         super().on_enter(*args)
@@ -135,6 +141,43 @@ class PlayAudioScreen(Screen):
         else:
             print("Failed to load sound")
 
+    def on_leave(self, *args):
+        """When user leave the screen, unbind the key press event"""
+        Window.unbind(on_key_down=self.on_key_press)
+        return super().on_leave(*args)
+
+    def on_key_press(self, instance, key, *args):
+        print("Key pressed:", key)
+
+        match key:
+            case KeyboardEnum.LEFT:
+                self.reverse()
+            case KeyboardEnum.RIGHT:
+                self.next()
+            case KeyboardEnum.UP:
+                self.play()
+            case KeyboardEnum.DOWN:
+                self.set_time_stamp()
+            case KeyboardEnum.SPACE:
+                self.pause()
+
+    @property
+    def time_stamp_index(self):
+        return self._time_stamp_index
+
+    @time_stamp_index.setter
+    def time_stamp_index(self, value):
+        self._time_stamp_index = value
+
+        if self.time_stamp_index < 0:
+            self._time_stamp_index = 0
+
+    def set_time_stamp(self):
+        """Add time stamp to the list and pause the sound"""
+        self.time_stamp_index += 1
+        self._time_stamp.append(self.sound.get_pos())
+        self.pause()
+
     def back(self):
         if self.sound:
             self.sound.stop()
@@ -146,18 +189,44 @@ class PlayAudioScreen(Screen):
     def play(self):
         if self.sound:
             if self.sound.state == "stop":
+                self.ids.pause_button.disabled = False
                 self.sound.seek(self.current_position)
             self.sound.play()
             self.update_event = Clock.schedule_interval(self.update_progress_bar, 0.1)
 
-    def pause(self):
+    def pause(self) -> None:
+        """
+        Pause the current sound when the user press the pause button.
+
+        The following actions are performed:
+            - Stops the sound playback if it is currently playing.
+            - Cancels the scheduled update event
+            - Saves the current position of the sound for resuming later.
+            - Disables the pause button to prevent further interaction.
+        """
         if self.sound:
             if self.sound.state == "play":
+                self.ids.pause_button.disabled = True
                 self.current_position = self.sound.get_pos()
                 self.sound.stop()
                 if self.update_event:
                     self.update_event.cancel()
                     self.update_event = None
+
+    def next(self):
+        print("Next")
+
+    def reverse(self):
+        # TODO: implemented
+        # if self.sound:
+        #     if self.sound.state == "play":
+        #         print("Stop")
+        #         self.sound.stop()
+
+        #     self.sound.seek(self._time_stamp[self._time_stamp_index])
+        #     self._time_stamp_index -= 1
+        #     self.sound.play()
+        print("Reverse")
 
     def update_progress_bar(self, dt):
         if self.sound:
