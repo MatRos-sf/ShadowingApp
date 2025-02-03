@@ -2,8 +2,8 @@ from enum import IntEnum
 
 
 class KeyboardEnum(IntEnum):
-    LEFT = 276
-    RIGHT = 275
-    UP = 273
-    DOWN = 274
-    SPACE = 32
+    LEFT = 276  # reverse
+    RIGHT = 275  # next
+    UP = 273  # play
+    DOWN = 274  # time stamp
+    SPACE = 32  # pause
