@@ -1,11 +1,10 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 
-# Import your MainScreen class
-from ui.screens import MainScreen
+from ui.screens.main_screen import MainScreen
 
 
 class TestMainScreen(unittest.TestCase):
@@ -32,15 +31,25 @@ class TestMainScreen(unittest.TestCase):
         # Check if the play button is not disabled by default
         self.assertFalse(self.main_screen.ids.play_button.disabled)
 
-    @patch("ui.screens.AUDIO_FILE_PATH", "/path/to/audio/file.mp3")
-    def test_play_button_is_disabled_when_path_exists(self):
+    @patch("kivy.app.App.get_running_app")
+    def test_play_button_is_disabled_when_path_exists(self, mock_app):
+        mock_app_instance = MagicMock()
+        mock_app_instance.SELECTED_AUDIO_FILE = "/path/to/audio/file.mp3"
+        mock_app.return_value = mock_app_instance
+
         self.main_screen.on_enter()
 
         self.assertFalse(
             self.main_screen.ids.play_button.disabled, "Play button should be disabled"
         )
 
-    def test_on_enter_without_audio_file(self):
+    @patch("kivy.app.App.get_running_app")
+    def test_on_enter_without_audio_file(self, mock_app):
+        # mock instance
+        mock_instance = MagicMock()
+        mock_instance.SELECTED_AUDIO_FILE = None
+        mock_app.return_value = mock_instance
+
         # Call on_enter to update the button state
         self.main_screen.on_enter()
 
@@ -50,8 +59,12 @@ class TestMainScreen(unittest.TestCase):
             "Play button should be disabled when AUDIO_FILE_PATH is None",
         )
 
-    @patch("ui.screens.AUDIO_FILE_PATH", "/path/to/audio/file.mp3")
-    def test_when_button_play_disabled_should_set_info(self):
+    @patch("kivy.app.App.get_running_app")
+    def test_when_button_play_disabled_should_set_info(self, mock_app):
+        mock_instance = MagicMock()
+        mock_instance.SELECTED_AUDIO_FILE = "/path/to/audio/file.mp3"
+        mock_app.return_value = mock_instance
+
         self.main_screen.on_enter()
 
         self.assertEqual(

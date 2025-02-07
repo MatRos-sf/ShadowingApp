@@ -1,0 +1,87 @@
+#:kivy 2.0.0
+
+<PlayAudioScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: 10
+        spacing: 10
+
+        Label:
+            id: title
+            text: "Audio Player"
+            size_hint_y: 0.1
+            height: 40
+
+        Slider:
+            id: progress_bar
+            size_hint_y: 0.3
+            min: 0
+            max: 1  # It will be updated when the audio is loaded
+            value: 0
+            height: 30  # Ustaw wysokość slidera
+            on_touch_down: if self.collide_point(*args[1].pos): root.seek(self.value)
+            on_touch_move: if self.collide_point(*args[1].pos): root.seek(self.value)
+            on_touch_up: print("HERHEHEH")
+
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.2
+            height: 40
+
+            Label:
+                id: current_time
+                text: "00:00"
+                size_hint_x: None
+                width: 60
+
+            Label:
+                id: time_stamp_info
+                text: ""
+
+            Label:
+                id: total_time
+                text: "00:00"
+                size_hint_x: None
+                width: 60
+
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.2
+            height: 40
+
+            Button:
+                id: reverse_button
+                text: "Reverse"
+                on_press: root.reverse()
+
+            Button:
+                id: pause_button
+                text: "Pause"
+                on_press: root.pause()
+
+            Button:
+                id: play_button
+                text: "Play"
+                on_press: root.play()
+
+            Button:
+                id: time_stamp_button
+                text: "Time Stamp"
+                on_press: root.set_time_stamp()
+
+            Button:
+                id: next_button
+                text: "Next"
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.1
+            height: 40
+
+            Button:
+                id: back_button
+                text: "Back"
+                on_press: root.back()
+
+            Button:
+                id: save_button
+                text: "Save"

@@ -4,7 +4,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 
-from ui.screens import ReadFileScreen
+from ui.screens.read_file_screen import ReadFileScreen
 
 
 class TestFileChooser(unittest.TestCase):

@@ -4,7 +4,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.slider import Slider
 
-from ui.screens import PlayAudioScreen
+from ui.screens.play_audio_screen import PlayAudioScreen
 
 
 class TestFileChooser(unittest.TestCase):
@@ -22,7 +22,7 @@ class TestFileChooser(unittest.TestCase):
         self.assertIsNotNone(self.file_chooser.ids.title)
         self.assertIsNotNone(self.file_chooser.ids.progress_bar)
         self.assertIsNotNone(self.file_chooser.ids.current_time)
-        self.assertIsNotNone(self.file_chooser.ids.separator)
+        self.assertIsNotNone(self.file_chooser.ids.time_stamp_info)
         self.assertIsNotNone(self.file_chooser.ids.total_time)
         self.assertIsNotNone(self.file_chooser.ids.reverse_button)
         self.assertIsNotNone(self.file_chooser.ids.pause_button)
@@ -38,7 +38,7 @@ class TestFileChooser(unittest.TestCase):
         self.assertIsInstance(self.file_chooser.ids.title, Label)
         self.assertIsInstance(self.file_chooser.ids.progress_bar, Slider)
         self.assertIsInstance(self.file_chooser.ids.current_time, Label)
-        self.assertIsInstance(self.file_chooser.ids.separator, Label)
+        self.assertIsInstance(self.file_chooser.ids.time_stamp_info, Label)
         self.assertIsInstance(self.file_chooser.ids.total_time, Label)
         self.assertIsInstance(self.file_chooser.ids.reverse_button, Button)
         self.assertIsInstance(self.file_chooser.ids.pause_button, Button)

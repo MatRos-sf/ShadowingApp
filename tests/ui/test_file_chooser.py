@@ -5,7 +5,7 @@ from kivy.uix.button import Button
 from kivy.uix.filechooser import FileChooserIconView
 from kivy.uix.label import Label
 
-from ui.screens import FileChooser
+from ui.screens.file_chooser import FileChooser
 
 
 class TestFileChooser(unittest.TestCase):
