@@ -1,0 +1,36 @@
+#:kivy 2.0.0
+
+<FileChooser>:
+    id: file_chooser_screen
+
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: 50
+        spacing: 50
+
+        FileChooserIconView:
+            id: file_chooser
+            size_hint_y: 0.7
+            filters: ["*.mp3", "*.wav", "*.ogg"]
+            on_selection: file_chooser_screen.selected(file_chooser.selection)
+
+        Label:
+            id: selected_label
+            size_hint_y: 0.1
+            height: 50
+
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.1
+
+            Button:
+                id: choose_button
+                text: "Choose"
+                on_press: file_chooser_screen.choose()
+                disabled: not file_chooser.selection
+
+            Button:
+                id: cancel_button
+                text: "Cancel"
+                on_press: file_chooser_screen.cancel()

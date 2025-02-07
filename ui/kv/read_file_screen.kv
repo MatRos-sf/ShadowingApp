@@ -1,0 +1,44 @@
+#:kivy 2.0.0
+
+<ReadFileScreen>:
+    id: read_file_screen
+
+    BoxLayout:
+        id: main_structure
+        orientation: "vertical"
+        size: root.width, root.height
+
+        padding: 50
+        spacing: 50
+
+        Label:
+            id: info_label
+            text: "Your files"
+            size_hint_y: 0.1
+
+
+        ScrollView:
+            id: scroll_view
+            do_scroll_x: False
+            do_scroll_y: True
+            size_hint_y: 0.75
+
+        Label:
+            id: chose_file
+            size_hint_y: 0.05
+
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.1
+            height: 40
+
+            Button:
+                id: button_back
+                text: "Back"
+                on_press: read_file_screen.back()
+
+            Button:
+                id: button_choose
+                text: "Choose"
+                disabled: not read_file_screen.selected_button
+                on_press: read_file_screen.choose()
