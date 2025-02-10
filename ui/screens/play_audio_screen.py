@@ -43,38 +43,41 @@ class PlayAudioScreen(Screen):
         Window.bind(on_key_down=self.on_key_press)
 
         app = App.get_running_app()
-        self.sound = SoundLoader.load(str(app.SELECTED_AUDIO_FILE))
+        self.load_sound(app.SELECTED_AUDIO_FILE)
 
+    def on_leave(self, *args):
+        """When user leave the screen, unbind the key press event"""
+        self.custom_setup()
+        Window.unbind(on_key_down=self.on_key_press)
+        self.stop_sound()
+        super().on_leave(*args)
+
+    def on_key_press(self, instance, key, *args):
+        print("Key pressed:", key)
+        key_actions = {
+            KeyboardEnum.LEFT: self.reverse,
+            KeyboardEnum.RIGHT: self.next,
+            KeyboardEnum.UP: self.play,
+            KeyboardEnum.DOWN: self.set_time_stamp,
+            KeyboardEnum.SPACE: self.pause,
+        }
+        action = key_actions.get(key)
+        if action:
+            action()
+
+    def load_sound(self, file_path):
+        self.sound = SoundLoader.load(str(file_path))
         if self.sound:
             self.ids.progress_bar.max = self.sound.length
             self.ids.total_time.text = self._format_time(self.sound.length)
         else:
             print("Failed to load sound")
 
-    def on_leave(self, *args):
-        """When user leave the screen, unbind the key press event"""
-        self.custom_setup()
-
-        Window.unbind(on_key_down=self.on_key_press)
+    def stop_sound(self):
         if self.sound:
             self.sound.stop()
-
-        super().on_leave(*args)
-
-    def on_key_press(self, instance, key, *args):
-        print("Key pressed:", key)
-
-        match key:
-            case KeyboardEnum.LEFT:
-                self.reverse()
-            case KeyboardEnum.RIGHT:
-                self.next()
-            case KeyboardEnum.UP:
-                self.play()
-            case KeyboardEnum.DOWN:
-                self.set_time_stamp()
-            case KeyboardEnum.SPACE:
-                self.pause()
+            self.sound.unload()
+            self.sound = None
 
     # time stamp section
     @property
@@ -113,7 +116,6 @@ class PlayAudioScreen(Screen):
         if int(current_pos) not in [int(ts) for ts in self._time_stamp]:
             bisect.insort(self._time_stamp, current_pos)
             self.time_stamp_index += 1
-
         else:
             message_box_info("Time stamp already exists. You can't add it again.")
         self.pause()
@@ -148,21 +150,14 @@ class PlayAudioScreen(Screen):
     def pause(self) -> None:
         """
         Pause the current sound when the user press the pause button.
-
-        The following actions are performed:
-            - Stops the sound playback if it is currently playing.
-            - Cancels the scheduled update event
-            - Saves the current position of the sound for resuming later.
-            - Disables the pause button to prevent further interaction.
         """
-        if self.sound:
-            if self.sound.state == "play":
-                self.ids.pause_button.disabled = True
-                self.current_position = self.sound.get_pos()
-                self.sound.stop()
-                if self.update_event:
-                    self.update_event.cancel()
-                    self.update_event = None
+        if self.sound and self.sound.state == "play":
+            self.ids.pause_button.disabled = True
+            self.current_position = self.sound.get_pos()
+            self.sound.stop()
+            if self.update_event:
+                self.update_event.cancel()
+                self.update_event = None
 
     def navigate(self, direction: Literal[1, -1]) -> None:
         """Navigate through the audio playback based on the given direction."""
