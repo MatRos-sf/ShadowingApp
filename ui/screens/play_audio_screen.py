@@ -24,7 +24,6 @@ class PlayAudioScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.custom_setup()
-        Window.bind(on_key_down=self.on_key_press)
 
     def custom_setup(self):
         """
@@ -37,8 +36,12 @@ class PlayAudioScreen(Screen):
         self._time_stamp = [0]
         self._time_stamp_index = 0
 
+    @update_time_stamp_label
     def on_enter(self, *args):
         super().on_enter(*args)
+        self.clean_events()
+        Window.bind(on_key_down=self.on_key_press)
+
         app = App.get_running_app()
         self.sound = SoundLoader.load(str(app.SELECTED_AUDIO_FILE))
 
@@ -50,14 +53,13 @@ class PlayAudioScreen(Screen):
 
     def on_leave(self, *args):
         """When user leave the screen, unbind the key press event"""
-        app = App.get_running_app()
-        app.SELECTED_AUDIO_FILE = None
         self.custom_setup()
 
         Window.unbind(on_key_down=self.on_key_press)
         if self.sound:
             self.sound.stop()
-        return super().on_leave(*args)
+
+        super().on_leave(*args)
 
     def on_key_press(self, instance, key, *args):
         print("Key pressed:", key)
@@ -93,6 +95,16 @@ class PlayAudioScreen(Screen):
             self._time_stamp_index = 0
         elif len(self._time_stamp) <= self.time_stamp_index:
             self._time_stamp_index = len(self._time_stamp) - 1
+
+    def clean_events(self):
+        """Clean the scheduled events if they exist"""
+        if self.update_event:
+            self.update_event.cancel()
+            self.update_event = None
+
+        if self.time_stamp_control:
+            self.time_stamp_control.cancel()
+            self.time_stamp_control = None
 
     @update_time_stamp_label
     def set_time_stamp(self):
