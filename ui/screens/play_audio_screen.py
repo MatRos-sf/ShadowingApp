@@ -55,6 +55,8 @@ class PlayAudioScreen(Screen):
         self.custom_setup()
 
         Window.unbind(on_key_down=self.on_key_press)
+        if self.sound:
+            self.sound.stop()
         return super().on_leave(*args)
 
     def on_key_press(self, instance, key, *args):
@@ -169,6 +171,7 @@ class PlayAudioScreen(Screen):
         """Navigate to the previous time stamp in the audio playback."""
         self.navigate(-1)
 
+    @update_time_stamp_label
     def timer_guard(self) -> float:
         if self.time_stamp_control:
             print("Timer guard cancelled")
@@ -192,12 +195,13 @@ class PlayAudioScreen(Screen):
 
     @update_time_stamp_label
     def control_time(self, end, dt):
-        current_pos = self.sound.get_pos()
-        if current_pos >= end:
-            if self.sound.state == "play":
-                self.time_stamp_index += 1
-                self.pause()
-                self.timer_guard()
+        if self.sound:
+            current_pos = self.sound.get_pos()
+            if current_pos >= end:
+                if self.sound.state == "play":
+                    self.time_stamp_index += 1
+                    self.pause()
+                    self.timer_guard()
 
     def seek(self, position):
         """Seek do określonej pozycji w dźwięku"""
