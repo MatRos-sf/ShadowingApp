@@ -6,6 +6,8 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager
 
+from models.db_setup import Base, engine
+from models.models import AudioModel  # noqa: F401
 from ui.screens.file_chooser import FileChooser
 from ui.screens.main_screen import MainScreen
 from ui.screens.play_audio_screen import PlayAudioScreen
@@ -18,6 +20,8 @@ class ShadowApp(App):
     SELECTED_AUDIO_FILE: Optional[Path | str] = None
 
     def build(self) -> ScreenManager:
+        Base.metadata.create_all(bind=engine)
+
         sm = ScreenManager()
         sm.add_widget(MainScreen(name="main_screen"))
         sm.add_widget(FileChooser(name="file_chooser_screen"))
