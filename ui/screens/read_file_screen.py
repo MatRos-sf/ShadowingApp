@@ -1,12 +1,11 @@
 from pathlib import Path
 
-from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.screenmanager import Screen
 
 from . import KIVY_FILE
+from .manager_screen import ManagerScreen
 
 RFS_KIVY = Path("read_file_screen.kv")
 
@@ -24,7 +23,7 @@ SAMPLE_FILES_PATH = [
 ]
 
 
-class ReadFileScreen(Screen):
+class ReadFileScreen(ManagerScreen):
     selected_button = None
 
     def on_enter(self, *args):
@@ -70,6 +69,5 @@ class ReadFileScreen(Screen):
         self.ids.chose_file.text = ""
 
     def choose(self):
-        app = App.get_running_app()
-        app.SELECTED_AUDIO_FILE = self.selected_button.text
+        self.set_audio_file(self.selected_button.text)
         self.manager.current = "main_screen"
