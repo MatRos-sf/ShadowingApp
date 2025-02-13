@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
@@ -11,6 +11,17 @@ from utils.kivy_extensions import message_box_info
 
 
 class ManagerScreen(Screen):
+    # these fields are neccessary to create AudioSession
+    FIELD_TO_SESSION = (
+        AudioModel.id,
+        AudioModel.name,
+        AudioModel.file_path,
+        AudioModel.time_stamp,
+        AudioModel.spend_time,
+        AudioModel.finished_times,
+        AudioModel.duration,
+    )
+
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
 
@@ -22,6 +33,16 @@ class ManagerScreen(Screen):
     def get_audio_file(self) -> Optional[Path]:  # ? Path | str
         app = App.get_running_app()
         return app.SELECTED_AUDIO_FILE
+
+    def set_audio_session(self, audio_session: AudioSession):
+        app = App.get_running_app()
+        app.AUDIO_SESSION = audio_session
+
+    def get_audio_session(self) -> Optional[AudioSession]:
+        app = App.get_running_app()
+        return app.AUDIO_SESSION
+
+    # TODO: compare audio session
 
     def create_audio(self, file_path: Path, *args) -> AudioSession:
         audio = AudioModel(
@@ -46,19 +67,18 @@ class ManagerScreen(Screen):
     def update_audio():
         pass
 
-    def list_audio():
-        pass
+    def list_audio(self) -> List[AudioSession]:
+        stmt = select(*self.FIELD_TO_SESSION).order_by(AudioModel.added)
+
+        results = []
+        with DataBaseSessionManager() as session:
+            for row in session.execute(stmt).all():
+                results.append(AudioSession.parse_data(row._asdict()))
+
+        return results
 
     def find_audio(self, audio_name: str) -> Optional[AudioSession]:
-        stmt = select(
-            AudioModel.id,
-            AudioModel.name,
-            AudioModel.file_path,
-            AudioModel.time_stamp,
-            AudioModel.spend_time,
-            AudioModel.finished_times,
-            AudioModel.duration,
-        ).where(AudioModel.name == audio_name)
+        stmt = select(*self.FIELD_TO_SESSION).where(AudioModel.name == audio_name)
 
         with DataBaseSessionManager() as session:
             audio = session.execute(stmt).first()
