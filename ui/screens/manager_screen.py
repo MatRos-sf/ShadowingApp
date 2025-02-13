@@ -3,9 +3,10 @@ from typing import Optional
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
+from sqlalchemy import select
 
 from models.models import AudioModel
-from models.session_manager import DataBaseSessionManager
+from models.session_manager import AudioSession, DataBaseSessionManager
 from utils.kivy_extensions import message_box_info
 
 
@@ -22,13 +23,25 @@ class ManagerScreen(Screen):
         app = App.get_running_app()
         return app.SELECTED_AUDIO_FILE
 
-    def create_audio(self, file_path: Path, *args):
+    def create_audio(self, file_path: Path, *args) -> AudioSession:
+        audio = AudioModel(
+            name=str(file_path.name), file_path=str(file_path), time_stamp=""
+        )
         with DataBaseSessionManager() as session:
             audio = AudioModel(
                 name=str(file_path.name), file_path=str(file_path), time_stamp=""
             )
             session.add(audio)
             session.commit()
+            return AudioSession(
+                id=audio.id,
+                name=audio.name,
+                file_path=audio.file_path,
+                time_stamp=[],
+                spend_time=audio.spend_time,
+                finished_times=audio.finished_times,
+                duration=audio.duration,
+            )
 
     def update_audio():
         pass
@@ -36,14 +49,23 @@ class ManagerScreen(Screen):
     def list_audio():
         pass
 
-    def find_audio(self, audio_name: str):
+    def find_audio(self, audio_name: str) -> Optional[AudioSession]:
+        stmt = select(
+            AudioModel.id,
+            AudioModel.name,
+            AudioModel.file_path,
+            AudioModel.time_stamp,
+            AudioModel.spend_time,
+            AudioModel.finished_times,
+            AudioModel.duration,
+        ).where(AudioModel.name == audio_name)
+
         with DataBaseSessionManager() as session:
-            audio = session.query(AudioModel).filter_by(name=audio_name).first()
-            return audio
+            audio = session.execute(stmt).first()
+            return AudioSession.parse_data(audio._asdict()) if audio else None
 
-    def get_or_create_audio(self, audio_path: Path):
+    def get_or_create_audio(self, audio_path: Path) -> AudioSession:
         audio = self.find_audio(audio_path.name)
-
         if audio is None:
             audio = self.create_audio(audio_path)
         else:
