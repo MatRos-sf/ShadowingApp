@@ -1,12 +1,11 @@
 from pathlib import Path
 
-from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.screenmanager import Screen
 
 from . import KIVY_FILE
+from .manager_screen import ManagerScreen
 
 RFS_KIVY = Path("read_file_screen.kv")
 
@@ -24,7 +23,7 @@ SAMPLE_FILES_PATH = [
 ]
 
 
-class ReadFileScreen(Screen):
+class ReadFileScreen(ManagerScreen):
     selected_button = None
 
     def on_enter(self, *args):
@@ -32,13 +31,14 @@ class ReadFileScreen(Screen):
         When the screen is entered, create dynamic buttons with recently selected files
         """
         # Remove any existing widget in the ScrollView
+        self.list_of_audio_session = self.list_audio()
         self.ids.scroll_view.clear_widgets()
 
         # create dynamic buttons
         layout = GridLayout(cols=1, spacing=10, size_hint_y=None)
         layout.bind(minimum_height=layout.setter("height"))
-        for path in SAMPLE_FILES_PATH:
-            btn = Button(text=path, size_hint_y=None, height=40)
+        for row in self.list_of_audio_session:
+            btn = Button(text=row.file_path, size_hint_y=None, height=40)
             btn.bind(on_press=self.on_button_click)
             layout.add_widget(btn)
         self.ids.scroll_view.add_widget(layout)
@@ -70,6 +70,16 @@ class ReadFileScreen(Screen):
         self.ids.chose_file.text = ""
 
     def choose(self):
-        app = App.get_running_app()
-        app.SELECTED_AUDIO_FILE = self.selected_button.text
+        selected_file = self.selected_button.text
+        self.set_audio_file(selected_file)
+        self.set_audio_session(
+            next(
+                (
+                    session
+                    for session in self.list_of_audio_session
+                    if session.file_path == selected_file
+                ),
+                None,
+            )
+        )
         self.manager.current = "main_screen"

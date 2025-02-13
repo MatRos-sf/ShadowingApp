@@ -13,7 +13,7 @@ class AudioModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column()
-    file_path: Mapped[str] = mapped_column()
+    file_path: Mapped[str] = mapped_column(unique=True)
     time_stamp: Mapped[str] = mapped_column(
         comment="This field represents the timestamp, separated by a comma"
     )

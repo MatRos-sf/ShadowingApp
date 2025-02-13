@@ -3,24 +3,23 @@ from functools import partial
 from pathlib import Path
 from typing import Literal, Optional
 
-from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.lang.builder import Builder
-from kivy.uix.screenmanager import Screen
 
 from utils.decorators import update_time_stamp_label
 from utils.enums import KeyboardEnum
 from utils.kivy_extensions import message_box_info
 
 from . import KIVY_FILE
+from .manager_screen import ManagerScreen
 
 PLS_KIVY = Path("play_audio_screen.kv")
 Builder.load_file(str(KIVY_FILE / PLS_KIVY))
 
 
-class PlayAudioScreen(Screen):
+class PlayAudioScreen(ManagerScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.custom_setup()
@@ -42,8 +41,7 @@ class PlayAudioScreen(Screen):
         self.clean_events()
         Window.bind(on_key_down=self.on_key_press)
 
-        app = App.get_running_app()
-        self.load_sound(app.SELECTED_AUDIO_FILE)
+        self.load_sound(self.get_audio_file())
 
     def on_leave(self, *args):
         """When user leave the screen, unbind the key press event"""
