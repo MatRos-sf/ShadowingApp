@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from kivy.uix.button import Button
@@ -34,7 +35,7 @@ class TestMainScreen(unittest.TestCase):
     @patch("kivy.app.App.get_running_app")
     def test_play_button_is_disabled_when_path_exists(self, mock_app):
         mock_app_instance = MagicMock()
-        mock_app_instance.SELECTED_AUDIO_FILE = "/path/to/audio/file.mp3"
+        mock_app_instance.SELECTED_AUDIO_FILE = Path("/path/to/audio/file.mp3")
         mock_app.return_value = mock_app_instance
 
         self.main_screen.on_enter()
@@ -62,7 +63,7 @@ class TestMainScreen(unittest.TestCase):
     @patch("kivy.app.App.get_running_app")
     def test_when_button_play_disabled_should_set_info(self, mock_app):
         mock_instance = MagicMock()
-        mock_instance.SELECTED_AUDIO_FILE = "/path/to/audio/file.mp3"
+        mock_instance.SELECTED_AUDIO_FILE = Path("/path/to/audio/file.mp3")
         mock_app.return_value = mock_instance
 
         self.main_screen.on_enter()
