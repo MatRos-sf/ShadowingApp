@@ -25,6 +25,7 @@ class FileChooser(ManagerScreen):
     def choose(self):
         """Sets the selected audio file and moves to the main screen"""
         self.set_audio_file(self.ids.file_chooser.selection[0])
+        self.get_or_create_audio(self.get_audio_file())
         self.manager.current = "main_screen"
 
     def cancel(self):
