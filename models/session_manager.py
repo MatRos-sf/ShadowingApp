@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List
 
 from .db_setup import SessionLocal
@@ -25,7 +26,7 @@ class DataBaseSessionManager:
 class AudioSession:
     id: int
     name: str
-    file_path: str
+    file_path: Path
     time_stamp: List[float]
     duration: int
     spend_time: int
@@ -33,6 +34,6 @@ class AudioSession:
 
     @classmethod
     def parse_data(cls, data: tuple) -> "AudioSession":
-        data["time_stamp"] = [float(i) for i in data["time_stamp"]]
-        print(data)
-        return AudioSession(**data)
+        time_stamp = [float(i) for i in data.pop("time_stamp")]
+        file_path = Path(data.pop("file_path"))
+        return cls(**data, time_stamp=time_stamp, file_path=file_path)
