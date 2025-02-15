@@ -34,7 +34,7 @@ class ManagerScreen(Screen):
         app = App.get_running_app()
         return app.SELECTED_AUDIO_FILE
 
-    def set_audio_session(self, audio_session: AudioSession):
+    def set_audio_session(self, audio_session: AudioSession) -> None:
         app = App.get_running_app()
         app.AUDIO_SESSION = audio_session
 
@@ -42,7 +42,12 @@ class ManagerScreen(Screen):
         app = App.get_running_app()
         return app.AUDIO_SESSION
 
-    # TODO: compare audio session
+    def update_audio_session(self, new_audio_session: AudioSession) -> None:
+        difference = self.get_audio_session().diff(new_audio_session)
+        print(difference)
+        if difference:
+            self.set_audio_session(new_audio_session)
+            self.update_audio(new_audio_session.id, difference)
 
     def create_audio(self, file_path: Path, *args) -> AudioSession:
         audio = AudioModel(
@@ -64,8 +69,10 @@ class ManagerScreen(Screen):
                 duration=audio.duration,
             )
 
-    def update_audio():
-        pass
+    def update_audio(self, pk: int, update_columns: dict):
+        with DataBaseSessionManager() as session:
+            session.query(AudioModel).filter(AudioModel.id == pk).update(update_columns)
+            session.commit()
 
     def list_audio(self) -> List[AudioSession]:
         stmt = select(*self.FIELD_TO_SESSION).order_by(AudioModel.added)

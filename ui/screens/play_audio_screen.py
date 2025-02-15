@@ -1,4 +1,5 @@
 import bisect
+from copy import deepcopy
 from functools import partial
 from pathlib import Path
 from typing import Literal, Optional
@@ -38,16 +39,28 @@ class PlayAudioScreen(ManagerScreen):
     @update_time_stamp_label
     def on_enter(self, *args):
         super().on_enter(*args)
+
         self.clean_events()
+        self.current_audio_session = deepcopy(self.get_audio_session())
+        time_stamp = self.current_audio_session.time_stamp or [0]
+        self._time_stamp = time_stamp
+        self._time_stamp_index = len(time_stamp) - 1
+        self.current_position = self._time_stamp[self.time_stamp_index]
+        self.ids.progress_bar.value = self.current_position
+        self.ids.current_time.text = self._format_time(self.current_position)
+
         Window.bind(on_key_down=self.on_key_press)
 
         self.load_sound(self.get_audio_file())
 
     def on_leave(self, *args):
         """When user leave the screen, unbind the key press event"""
-        self.custom_setup()
         Window.unbind(on_key_down=self.on_key_press)
         self.stop_sound()
+        self.current_audio_session.time_stamp = self._time_stamp
+        self.update_audio_session(self.current_audio_session)
+        self.custom_setup()
+
         super().on_leave(*args)
 
     def on_key_press(self, instance, key, *args):
@@ -66,8 +79,10 @@ class PlayAudioScreen(ManagerScreen):
     def load_sound(self, file_path):
         self.sound = SoundLoader.load(str(file_path))
         if self.sound:
-            self.ids.progress_bar.max = self.sound.length
-            self.ids.total_time.text = self._format_time(self.sound.length)
+            length_sound = self.sound.length
+            self.current_audio_session.duration = length_sound
+            self.ids.progress_bar.max = length_sound
+            self.ids.total_time.text = self._format_time(length_sound)
         else:
             print("Failed to load sound")
 
@@ -144,6 +159,12 @@ class PlayAudioScreen(ManagerScreen):
                 self.sound.seek(self.current_position)
             self.sound.play()
             self.update_event = Clock.schedule_interval(self.update_progress_bar, 0.1)
+            self.duration_time_event = Clock.schedule_interval(self.count_duration, 1)
+
+    def count_duration(self, dt):
+        if self.sound and self.sound.state == "play":
+            self.current_audio_session.spend_time += 1
+            print(self.current_audio_session.spend_time)
 
     def pause(self) -> None:
         """
@@ -156,6 +177,9 @@ class PlayAudioScreen(ManagerScreen):
             if self.update_event:
                 self.update_event.cancel()
                 self.update_event = None
+
+                self.duration_time_event.cancel()
+                self.duration_time_event = None
 
     def navigate(self, direction: Literal[1, -1]) -> None:
         """Navigate through the audio playback based on the given direction."""
@@ -197,6 +221,7 @@ class PlayAudioScreen(ManagerScreen):
 
             if current_pos >= self.sound.length:
                 self.pause()
+                self.current_audio_session.finished_times += 1
 
     @update_time_stamp_label
     def control_time(self, end, dt):
