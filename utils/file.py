@@ -7,7 +7,7 @@ DEFAULT_AUDIO_KEEPER = Path(__file__).parent.parent / Path("audio")
 
 def file_exists(file_path: Path) -> bool:
     file_name = file_path.name
-    return Path(DEFAULT_AUDIO_KEEPER / file_name).is_file()
+    return Path(DEFAULT_AUDIO_KEEPER / Path(file_name)).is_file()
 
 
 def copy_file(
