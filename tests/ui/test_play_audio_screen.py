@@ -34,6 +34,8 @@ class TestPlayAudioScreen(unittest.TestCase):
         self.assertIsNone(self.play_audio_screen.sound)
         self.assertIsNone(self.play_audio_screen.update_event)
         self.assertEqual(self.play_audio_screen.current_position, 0)
+        self.assertEqual(self.play_audio_screen._time_stamp, [0])
+        self.assertEqual(self.play_audio_screen.time_stamp_index, 0)
 
     def test_widgets_exist(self):
         """Verify that all widgets were created"""

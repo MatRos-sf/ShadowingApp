@@ -32,7 +32,9 @@ class PlayAudioScreen(ManagerScreen):
         self.sound: Optional[SoundLoader] = None
         self.update_event = None  # Event to update the progress bar
         self.time_stamp_control = None  # Event to control the time stamp
-        # self.current_position = 0       # time: self._time_stamp_index should points
+        self.current_position = 0
+        self._time_stamp = [0]
+        self._time_stamp_index = 0
 
     @update_time_stamp_label
     def on_enter(self, *args):
