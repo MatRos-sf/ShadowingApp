@@ -184,3 +184,7 @@ fabric.properties
 # idea folder, uncomment if you don't need it
 .idea
 *.db
+
+# Ignore all files in audio/ except for files named 'info'
+audio/*
+!audio/info
