@@ -1,9 +1,12 @@
+import tempfile
+import time
 from pathlib import Path
 
 import pytest
+from pydub.generators import Sine
 
 from models.session_manager import AudioSession
-from utils.audio import TimeStampManager
+from utils.audio import AudioPlayer, TimeStampManager
 
 
 @pytest.fixture
@@ -75,3 +78,35 @@ class TestTimeStampManager:
         instance = TimeStampManager(sample_audio_session)
         instance.time_stamp_index = index
         assert instance.range() == expected_range
+
+
+class TestAudioPlayer:
+    def setup_method(self, test_method):
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
+            self.file_path = Path(tmp.name)
+
+        self.sine_wave = Sine(440).to_audio_segment(duration=10000)
+        self.sine_wave.export(str(self.file_path), format="mp3")
+        self.player = AudioPlayer(self.file_path)
+
+    def test_audio_player_load(self):
+        assert self.player.sound is not None
+        assert int(self.player.sound_length) == 10
+
+    def test_play(self):
+        self.player.play()
+        assert self.player.sound.state == "play"
+        time.sleep(2)
+        pos = self.player.get_position()
+        assert self.player.current_position < pos
+
+    def test_audio_player_pause(self):
+        self.player.play()
+        self.player.pause()
+
+        pos_after_pause = self.player.get_position()
+        assert pos_after_pause > 0
+
+    def test_audio_player_cleanup(self):
+        self.player.cleanup()
+        assert self.player.sound is None or self.player.sound.unload
