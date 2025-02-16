@@ -5,10 +5,10 @@ from pathlib import Path
 from typing import Literal, Optional
 
 from kivy.clock import Clock
-from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.lang.builder import Builder
 
+from utils.audio import AudioPlayer
 from utils.decorators import update_time_stamp_label
 from utils.enums import KeyboardEnum
 from utils.kivy_extensions import message_box_info
@@ -24,15 +24,14 @@ class PlayAudioScreen(ManagerScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.custom_setup()
+        self.audio_player: Optional[AudioPlayer] = None
 
     def custom_setup(self):
         """
         Custom setup for PlayAudioScreen
         """
-        self.sound: Optional[SoundLoader] = None
         self.update_event = None  # Event to update the progress bar
         self.time_stamp_control = None  # Event to control the time stamp
-        self.current_position = 0
         self._time_stamp = [0]
         self._time_stamp_index = 0
 
@@ -44,19 +43,21 @@ class PlayAudioScreen(ManagerScreen):
         self.current_audio_session = deepcopy(self.get_audio_session())
         time_stamp = self.current_audio_session.time_stamp or [0]
         self._time_stamp = time_stamp
-        self._time_stamp_index = len(time_stamp) - 1
-        self.current_position = self._time_stamp[self.time_stamp_index]
-        self.ids.progress_bar.value = self.current_position
-        self.ids.current_time.text = self._format_time(self.current_position)
+        self._time_stamp_index = len(time_stamp) - 1  # Ostatni timestamp
+        self.load_sound(self.get_audio_file())
+        print(self.current_audio_session)
+        # Ustawienie pozycji na ostatni time stamp
+        self.audio_player.current_position = self._time_stamp[self.time_stamp_index]
+        self.ids.progress_bar.value = self.audio_player.current_position
+        self.ids.current_time.text = self._format_time(
+            self.audio_player.current_position
+        )
 
         Window.bind(on_key_down=self.on_key_press)
-
-        self.load_sound(self.get_audio_file())
 
     def on_leave(self, *args):
         """When user leave the screen, unbind the key press event"""
         Window.unbind(on_key_down=self.on_key_press)
-        self.stop_sound()
         self.current_audio_session.time_stamp = self._time_stamp
         self.update_audio_session(self.current_audio_session)
         self.custom_setup()
@@ -76,21 +77,20 @@ class PlayAudioScreen(ManagerScreen):
         if action:
             action()
 
-    def load_sound(self, file_path):
-        self.sound = SoundLoader.load(str(file_path))
-        if self.sound:
-            length_sound = self.sound.length
-            self.current_audio_session.duration = length_sound
-            self.ids.progress_bar.max = length_sound
-            self.ids.total_time.text = self._format_time(length_sound)
-        else:
-            print("Failed to load sound")
+    def load_sound(self, file_path: Path):
+        """Ładujemy AudioPlayer objekt, następnie przypisujemy"""
+        self.audio_player = AudioPlayer(file_path)
 
-    def stop_sound(self):
-        if self.sound:
-            self.sound.stop()
-            self.sound.unload()
-            self.sound = None
+        length = self.audio_player.sound_length
+        self.current_audio_session.duration = length
+        self.ids.progress_bar.max = length
+        self.ids.total_time.text = self._format_time(length)
+
+    def cancel_event(self, event_name: str):
+        event = getattr(self, event_name, None)
+        if event:
+            event.cancel()
+            setattr(self, event_name, None)
 
     # time stamp section
     @property
@@ -125,7 +125,7 @@ class PlayAudioScreen(ManagerScreen):
     @update_time_stamp_label
     def set_time_stamp(self):
         """Add time stamp to the list and pause the sound"""
-        current_pos = self.sound.get_pos()
+        current_pos = self.audio_player.get_position()
         if int(current_pos) not in [int(ts) for ts in self._time_stamp]:
             bisect.insort(self._time_stamp, current_pos)
             self.time_stamp_index += 1
@@ -145,51 +145,43 @@ class PlayAudioScreen(ManagerScreen):
         )
 
     def back(self):
-        if self.sound:
-            self.sound.stop()
-            self.sound.unload()
-            self.sound = None
+        if self.audio_player.sound.state == "play":
+            self.audio_player.stop()
 
         self.manager.current = "main_screen"
 
     def play(self):
-        if self.sound:
-            if self.sound.state == "stop":
-                self.ids.pause_button.disabled = False
-                self.sound.seek(self.current_position)
-            self.sound.play()
-            self.update_event = Clock.schedule_interval(self.update_progress_bar, 0.1)
-            self.duration_time_event = Clock.schedule_interval(self.count_duration, 1)
+        """ "Audio.play() oraz ustwaienine eventów oraz zablokowanie przycisku"""
+        if self.audio_player.sound.state == "stop":
+            self.ids.pause_button.disabled = False
+        self.audio_player.play()
+
+        self.update_event = Clock.schedule_interval(self.update_progress_bar, 0.1)
+        self.duration_time_event = Clock.schedule_interval(self.count_duration, 1)
 
     def count_duration(self, dt):
-        if self.sound and self.sound.state == "play":
+        if self.audio_player.sound.state == "play":
             self.current_audio_session.spend_time += 1
-            print(self.current_audio_session.spend_time)
 
     def pause(self) -> None:
         """
         Pause the current sound when the user press the pause button.
         """
-        if self.sound and self.sound.state == "play":
+        if self.audio_player.sound.state == "play":
             self.ids.pause_button.disabled = True
-            self.current_position = self.sound.get_pos()
-            self.sound.stop()
-            if self.update_event:
-                self.update_event.cancel()
-                self.update_event = None
+            self.audio_player.pause()
 
-                self.duration_time_event.cancel()
-                self.duration_time_event = None
+            self.cancel_event("update_event")
+            self.cancel_event("duration_time_event")
 
     def navigate(self, direction: Literal[1, -1]) -> None:
         """Navigate through the audio playback based on the given direction."""
-        if self.sound:
+        if self.audio_player.sound:
             self.time_stamp_index += direction
-            if self.sound.state == "play":
-                self.sound.stop()
+            if self.audio_player.sound.state == "play":
+                self.audio_player.stop()
 
-            start = self.timer_guard()
-            self.seek(start)
+            self.audio_player.current_position = self.timer_guard()
             self.play()
 
     def next(self) -> None:
@@ -214,29 +206,27 @@ class PlayAudioScreen(ManagerScreen):
         return start
 
     def update_progress_bar(self, dt):
-        if self.sound:
-            current_pos = self.sound.get_pos()
+        if not self.audio_player:
+            return
+
+        if self.audio_player.sound:
+            current_pos = self.audio_player.get_position()
             self.ids.progress_bar.value = current_pos
             self.ids.current_time.text = self._format_time(current_pos)
 
-            if current_pos >= self.sound.length:
+            if self.audio_player.is_finished():
                 self.pause()
                 self.current_audio_session.finished_times += 1
 
     @update_time_stamp_label
     def control_time(self, end, dt):
-        if self.sound:
-            current_pos = self.sound.get_pos()
-            if current_pos >= end:
-                if self.sound.state == "play":
+        if self.audio_player.sound:
+            self.audio_player.current_position = self.audio_player.get_position()
+            if self.audio_player.current_position >= end:
+                if self.audio_player.sound.state == "play":
                     self.time_stamp_index += 1
                     self.pause()
                     self.timer_guard()
-
-    def seek(self, position):
-        """Seek do określonej pozycji w dźwięku"""
-        if self.sound:
-            self.sound.seek(position)
 
     @staticmethod
     def _format_time(seconds):
