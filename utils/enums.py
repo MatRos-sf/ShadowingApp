@@ -7,3 +7,4 @@ class KeyboardEnum(IntEnum):
     UP = 273  # play
     DOWN = 274  # time stamp
     SPACE = 32  # pause
+    R = 114  # remove time stamp

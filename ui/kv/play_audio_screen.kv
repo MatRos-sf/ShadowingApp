@@ -68,10 +68,14 @@
                 id: time_stamp_button
                 text: "Time Stamp"
                 on_press: root.set_time_stamp()
-
+            Button:
+                id: time_stamp_remove_button
+                text: "Remove Time Stamp"
+                on_press: root.remove_time_stamp()
             Button:
                 id: next_button
                 text: "Next"
+                on_press: root.next()
         BoxLayout:
             orientation: "horizontal"
             size_hint_y: 0.1
@@ -85,3 +89,4 @@
             Button:
                 id: save_button
                 text: "Save"
+                on_press: root.save()

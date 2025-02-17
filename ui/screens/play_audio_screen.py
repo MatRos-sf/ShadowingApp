@@ -51,7 +51,9 @@ class PlayAudioScreen(ManagerScreen, PlayAudioEvent):
             KeyboardEnum.UP: self.play,
             KeyboardEnum.DOWN: self.set_time_stamp,
             KeyboardEnum.SPACE: self.pause,
+            KeyboardEnum.R: self.remove_time_stamp,
         }
+        print(key)
         action = key_actions.get(key)
         if action:
             action()
@@ -91,6 +93,17 @@ class PlayAudioScreen(ManagerScreen, PlayAudioEvent):
 
         self.manager.current = "main_screen"
 
+    def save(self):
+        """Save the current audio session."""
+        if self.is_playing():
+            self.audio_player.stop()
+            self.cancel_events()
+        self.current_audio_session.time_stamp = self.time_stamp.time_stamp_list
+        self.update_audio_session(self.current_audio_session)
+        self.current_audio_session = deepcopy(self.get_audio_session())
+
+        message_box_info("Saved!")
+
     def play(self):
         """Start audio playback and enable the pause button."""
         if not self.is_playing():
@@ -125,3 +138,13 @@ class PlayAudioScreen(ManagerScreen, PlayAudioEvent):
     def reverse(self):
         """Navigate to the previous time stamp in the audio playback."""
         self.navigate(-1)
+
+    @update_time_stamp_label
+    def remove_time_stamp(self) -> None:
+        """Remove the current time stamp from the audio playback."""
+        try:
+            self.time_stamp.remove()
+        except ValueError:
+            message_box_info("You can't remove the first time stamp")
+        else:
+            self.navigate(0)
