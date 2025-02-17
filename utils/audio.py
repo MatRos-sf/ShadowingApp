@@ -93,3 +93,16 @@ class TimeStampManager:
             else None
         )
         return start, end
+
+    def remove(self) -> None:
+        """
+        Remove the current time stamp from the list.
+
+        Raises:
+            ValueError: When try to remove the first time stamp.
+        """
+        if self.time_stamp_index <= 0:
+            raise ValueError("Cannot remove the first time stamp")
+
+        self._time_stamp_list.pop(self.time_stamp_index)
+        self.time_stamp_index -= 1

@@ -125,3 +125,13 @@ class PlayAudioScreen(ManagerScreen, PlayAudioEvent):
     def reverse(self):
         """Navigate to the previous time stamp in the audio playback."""
         self.navigate(-1)
+
+    @update_time_stamp_label
+    def remove_time_stamp(self) -> None:
+        """Remove the current time stamp from the audio playback."""
+        try:
+            self.time_stamp.remove()
+        except ValueError:
+            message_box_info("You can't remove the first time stamp")
+        else:
+            self.navigate(0)
