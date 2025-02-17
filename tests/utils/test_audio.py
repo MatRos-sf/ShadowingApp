@@ -1,5 +1,6 @@
 import tempfile
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
@@ -12,6 +13,11 @@ from utils.audio import AudioPlayer, TimeStampManager
 @pytest.fixture
 def sample_audio_session():
     return AudioSession(1, "Session 1", Path("/old/path"), [1.0, 2.0], 120, 30, 5)
+
+
+@dataclass
+class _DummyAudioSession:
+    time_stamp: list
 
 
 class TestTimeStampManager:
@@ -78,6 +84,25 @@ class TestTimeStampManager:
         instance = TimeStampManager(sample_audio_session)
         instance.time_stamp_index = index
         assert instance.range() == expected_range
+
+    @pytest.mark.parametrize("index", [1, 2, 3, 4])
+    def test_should_remove_time_stamp(self, index):
+        dummy_audio_session = _DummyAudioSession([1.0, 2.0, 3.0, 4.0, 5.0])
+        ts = TimeStampManager(dummy_audio_session)
+        ts._time_stamp_index = index
+
+        size_before = len(ts.time_stamp_list)
+        ts.remove()
+        size_after = len(ts.time_stamp_list)
+
+        assert size_after == size_before - 1
+
+    def test_should_raise_value_error_when_try_to_remove_first_time_stamp(self):
+        dummy_audio_session = _DummyAudioSession([1.0, 2.0, 3.0, 4.0, 5.0])
+        ts = TimeStampManager(dummy_audio_session)
+        ts._time_stamp_index = 0
+        with pytest.raises(ValueError):
+            ts.remove()
 
 
 class TestAudioPlayer:

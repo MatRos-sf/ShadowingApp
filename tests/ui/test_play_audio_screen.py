@@ -20,6 +20,7 @@ class TestPlayAudioScreen(unittest.TestCase):
             "time_stamp_info": Label(),
             "total_time": Label(),
             "reverse_button": Button(),
+            "time_stamp_remove_button": Button(),
             "pause_button": Button(),
             "play_button": Button(),
             "time_stamp_button": Button(),
@@ -44,10 +45,11 @@ class TestPlayAudioScreen(unittest.TestCase):
         self.assertIsNotNone(self.play_audio_screen.ids["pause_button"])
         self.assertIsNotNone(self.play_audio_screen.ids["play_button"])
         self.assertIsNotNone(self.play_audio_screen.ids["time_stamp_button"])
+        self.assertIsNotNone(self.play_audio_screen.ids["time_stamp_remove_button"])
         self.assertIsNotNone(self.play_audio_screen.ids["next_button"])
         self.assertIsNotNone(self.play_audio_screen.ids["back_button"])
         self.assertIsNotNone(self.play_audio_screen.ids["save_button"])
-        self.assertEqual(len(self.play_audio_screen.ids), 12)
+        self.assertEqual(len(self.play_audio_screen.ids), 13)
 
     def test_type_of_widgets(self):
         """Verify the type of widgets"""
