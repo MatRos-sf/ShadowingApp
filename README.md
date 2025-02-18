@@ -70,3 +70,10 @@ shadowing_app/
 ## Screenshots
 
 Here are some screenshots of the application in action:
+![Zrzut ekranu z 2025-02-18 21-22-26](https://github.com/user-attachments/assets/ac04fd93-9425-4a44-8677-f157e031901e)
+![Zrzut ekranu z 2025-02-18 21-22-46](https://github.com/user-attachments/assets/55b3c829-74bf-4da3-b263-f26549947a3c)
+![Zrzut ekranu z 2025-02-18 21-22-59](https://github.com/user-attachments/assets/611daac0-d71b-49d9-b709-374af71aceec)
+![Zrzut ekranu z 2025-02-18 21-23-05](https://github.com/user-attachments/assets/33e76c99-76ca-4d29-9e31-e2e53647ac32)
+![Zrzut ekranu z 2025-02-18 21-23-16](https://github.com/user-attachments/assets/e6b92563-9873-4709-9b2a-adfe78736ec2)
+![Zrzut ekranu z 2025-02-18 21-23-33](https://github.com/user-attachments/assets/628f37aa-af23-4cd3-808d-17c00e6f4381)
+
