@@ -31,7 +31,7 @@ class PlayAudioScreen(ManagerScreen, PlayAudioEvent):
         self.cancel_events()
         super().on_enter(*args)
 
-        self.current_audio_session = deepcopy(self.get_audio_session())
+        self.current_audio_session = deepcopy(self.audio_session)
         self.load_sound(self.get_audio_file())
         Window.bind(on_key_down=self.on_key_press)
 

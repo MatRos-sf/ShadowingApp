@@ -26,6 +26,16 @@ class ManagerScreen(Screen):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
 
+    @property
+    def audio_session(self) -> Optional[AudioSession]:
+        app = App.get_running_app()
+        return app.AUDIO_SESSION
+
+    @audio_session.setter
+    def audio_session(self, audio_session: AudioSession) -> None:
+        app = App.get_running_app()
+        app.AUDIO_SESSION = audio_session
+
     def set_audio_file(self, audio_files: str) -> None:
         app = App.get_running_app()
         app.SELECTED_AUDIO_FILE = Path(audio_files)
@@ -34,18 +44,10 @@ class ManagerScreen(Screen):
         app = App.get_running_app()
         return app.SELECTED_AUDIO_FILE
 
-    def set_audio_session(self, audio_session: AudioSession) -> None:
-        app = App.get_running_app()
-        app.AUDIO_SESSION = audio_session
-
-    def get_audio_session(self) -> Optional[AudioSession]:
-        app = App.get_running_app()
-        return app.AUDIO_SESSION
-
     def update_audio_session(self, new_audio_session: AudioSession) -> None:
-        difference = self.get_audio_session().diff(new_audio_session)
+        difference = self.audio_session.diff(new_audio_session)
         if difference:
-            self.set_audio_session(new_audio_session)
+            self.audio_session = new_audio_session
             self.update_audio(new_audio_session.id, difference)
 
     def create_audio(self, file_path: Path, *args) -> AudioSession:

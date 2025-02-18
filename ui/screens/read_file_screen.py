@@ -74,14 +74,12 @@ class ReadFileScreen(ManagerScreen):
         print(a)
         print(self.list_of_audio_session)
         print(selected_file)
-        self.set_audio_session(
-            next(
-                (
-                    session
-                    for session in self.list_of_audio_session
-                    if session.file_path == selected_file
-                ),
-                None,
-            )
+        self.audio_session = next(
+            (
+                session
+                for session in self.list_of_audio_session
+                if session.file_path == selected_file
+            ),
+            None,
         )
         self.manager.current = "main_screen"
