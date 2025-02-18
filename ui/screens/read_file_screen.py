@@ -60,20 +60,6 @@ class ReadFileScreen(ManagerScreen):
 
     def choose(self):
         selected_file = Path(self.selected_button.text)
-        self.set_audio_file(selected_file)
-
-        a = next(
-            (
-                session
-                for session in self.list_of_audio_session
-                if session.file_path == selected_file
-            ),
-            None,
-        )
-        print("-" * 100)
-        print(a)
-        print(self.list_of_audio_session)
-        print(selected_file)
         self.audio_session = next(
             (
                 session

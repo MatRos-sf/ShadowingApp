@@ -36,13 +36,9 @@ class ManagerScreen(Screen):
         app = App.get_running_app()
         app.AUDIO_SESSION = audio_session
 
-    def set_audio_file(self, audio_files: str) -> None:
-        app = App.get_running_app()
-        app.SELECTED_AUDIO_FILE = Path(audio_files)
-
     def get_audio_file(self) -> Optional[Path]:  # ? Path | str
         app = App.get_running_app()
-        return app.SELECTED_AUDIO_FILE
+        return app.AUDIO_SESSION.file_path if app.AUDIO_SESSION else None
 
     def update_audio_session(self, new_audio_session: AudioSession) -> None:
         difference = self.audio_session.diff(new_audio_session)
