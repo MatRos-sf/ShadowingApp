@@ -13,7 +13,14 @@ Shadowing App is a completed application designed to assist users in learning fo
 
 ### Additional Features
 - Voice recording for shadowing exercises (planned for a future update)
-- Keyboard shortcuts for essential controls (e.g., spacebar for play/pause)
+- Keyboard shortcuts for essential controls (e.g., spacebar for play/pause):
+    - Arrow Keys:
+        - **Left Arrow**: Rewind audio
+        - **Right Arrow**: Fast forward audio
+        - **Up Arrow**: Play audio
+        - **Down Arrow**: Add timestamp
+    - **Spacebar**: Pause audio
+    - **R**: Remove timestamp
 - Visual timeline markers for timestamps
 
 ## Technologies
@@ -39,7 +46,7 @@ python3 main.py
 - The application has been tested only on Linux systems.
 - This application is ideal for individuals looking to practice shadowing or dictation techniques to improve their language skills.
 - Recording functionality: A voice recording feature is planned and will be added in a future update.
-
+- **Automated Tests:** Tests are automatically executed during pull requests on GitHub to ensure code quality.
 ## Project Structure
 Here is a brief overview of the project structure:
 
