@@ -1,57 +1,65 @@
 # Shadowing App
 
-Shadowing App is a work-in-progress application designed to assist users in learning foreign languages through the shadowing technique. The application enables users to play audio files, record their voices, and interact with timestamps for enhanced learning.
+Shadowing App is a completed application designed to assist users in learning foreign languages through the shadowing technique or practicing dictation. The application enables users to play audio files, manage timestamps, and offers a variety of interactive features. Recording functionality is planned for future updates.
 
 ## Features
-### Planned Core Features
-- Audio playback (MP3, WAV, etc.).
-- Play, pause, rewind, and fast-forward functionality.
-- Interactive timeline with a draggable progress bar.
-- Timestamp creation and management during audio playback.
-- Storage of audio metadata and timestamps in a database.
+
+### Core Features
+- Audio playback (MP3, WAV, etc.)
+- Play, pause, rewind, and fast-forward functionality
+- Interactive timeline with a draggable progress bar
+- Timestamp creation and management during audio playback
+- Storage of audio metadata and timestamps in a database
 
 ### Additional Features
-- Voice recording for shadowing exercises:
-  - Users can listen to the audio, pause, and record their voice.
-  - Playback includes both the recording and the original audio in sequence.
-- Keyboard shortcuts for essential controls (e.g., spacebar for play/pause).
-- Visual timeline markers for timestamps.
+- Voice recording for shadowing exercises (planned for a future update)
+- Keyboard shortcuts for essential controls (e.g., spacebar for play/pause)
+- Visual timeline markers for timestamps
 
 ## Technologies
-- **Python**: Core application logic.
-- **Kivy**: User interface and screen management.
-- **SQLite + SQLAlchemy**: Database for storing audio metadata and timestamps.
-- **SoundLoader (Kivy)**: Audio playback.
-- **PyInstaller**: Packaging the application into an executable file.
+- **Python3.12**: Core application logic
+- **Kivy**: User interface and screen management
+- **SQLAlchemy**: Database for storing audio metadata and timestamps
+- **SoundLoader (Kivy)**: Audio playback
 
-## Development Roadmap
+## Installation
+
 1. **Set Up Environment**:
-   - Define project structure.
-   - Install necessary libraries (`kivy`, `sqlalchemy`, `pytest`).
+   ```sh
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+2. **Run app**
+```sh
+python3 main.py
+```
 
-2. **Basic Functionality**:
-   - Implement file loading and playback.
-   - Create a user-friendly interface for audio control.
+## Notes
+- The application has been tested only on Linux systems.
+- This application is ideal for individuals looking to practice shadowing or dictation techniques to improve their language skills.
+- Recording functionality: A voice recording feature is planned and will be added in a future update.
 
-3. **Database Integration**:
-   - Design and implement models for audio metadata and timestamps.
-   - Add functionality to save and retrieve user data.
+## Project Structure
+Here is a brief overview of the project structure:
 
-4. **Advanced Features**:
-   - Develop the recording feature for shadowing exercises.
-   - Enhance the timeline with timestamp markers.
+```
+shadowing_app/
+├── audio/          # User's audio files
+├── recordings/     # User's recordings
+├── database/       # Database (SQLite)
+│   ├── models.py   # SQLAlchemy data models
+│   └── db_setup.py # Database setup and configuration
+├── ui/             # Kivy interface-related files
+│   ├── screens.py  # Application screen definitions
+│   └── kv/         # KV files for layouts
+├── utils/          # Utility functions (e.g., for audio handling)
+│   ├── audio.py    # Audio playback and rewinding logic
+│   └── timestamps.py # Timestamp management
+├── main.py         # Application entry point
+└── tests/          # Application tests
+```
 
-5. **Testing**:
-   - Unit tests for audio and database logic.
-   - Integration tests for seamless user interaction.
+## Screenshots
 
-6. **Optimization and Packaging**:
-   - Refine the UI and improve performance.
-   - Package the application into an executable file.
-
-## Current Status
-This project is under active development. More details will be shared in upcoming commits and feature implementations.
-
----
-
-Stay tuned for updates and feel free to contribute ideas or suggestions!
+Here are some screenshots of the application in action:
