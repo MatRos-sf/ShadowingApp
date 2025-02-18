@@ -33,9 +33,10 @@ class AudioSession:
     finished_times: int
 
     @classmethod
-    def parse_data(cls, data: tuple) -> "AudioSession":
+    def parse_data(cls, data: dict) -> "AudioSession":
         data = data.copy()
-        time_stamp = [float(i) for i in data.pop("time_stamp").split(",")]
+        time_stamp = data.pop("time_stamp", None)
+        time_stamp = [float(i) for i in time_stamp.split(",")] if time_stamp else []
         file_path = Path(data.pop("file_path"))
         return cls(**data, time_stamp=time_stamp, file_path=file_path)
 

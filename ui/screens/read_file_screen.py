@@ -10,17 +10,6 @@ from .manager_screen import ManagerScreen
 RFS_KIVY = Path("read_file_screen.kv")
 
 Builder.load_file(str(KIVY_FILE / RFS_KIVY))
-SAMPLE_FILES_PATH = [
-    "/home/user/documents",
-    "/var/log/system.log",
-    "/etc/nginx/nginx.conf",
-    "/usr/local/bin/script.sh",
-    "/opt/software/config.yaml",
-    "/mnt/storage/backups",
-    "/dev/sda1",
-    "/proc/cpuinfo",
-    "/sys/kernel/debug",
-]
 
 
 class ReadFileScreen(ManagerScreen):
@@ -38,7 +27,7 @@ class ReadFileScreen(ManagerScreen):
         layout = GridLayout(cols=1, spacing=10, size_hint_y=None)
         layout.bind(minimum_height=layout.setter("height"))
         for row in self.list_of_audio_session:
-            btn = Button(text=row.file_path, size_hint_y=None, height=40)
+            btn = Button(text=str(row.file_path), size_hint_y=None, height=40)
             btn.bind(on_press=self.on_button_click)
             layout.add_widget(btn)
         self.ids.scroll_view.add_widget(layout)
@@ -70,8 +59,21 @@ class ReadFileScreen(ManagerScreen):
         self.ids.chose_file.text = ""
 
     def choose(self):
-        selected_file = self.selected_button.text
+        selected_file = Path(self.selected_button.text)
         self.set_audio_file(selected_file)
+
+        a = next(
+            (
+                session
+                for session in self.list_of_audio_session
+                if session.file_path == selected_file
+            ),
+            None,
+        )
+        print("-" * 100)
+        print(a)
+        print(self.list_of_audio_session)
+        print(selected_file)
         self.set_audio_session(
             next(
                 (
