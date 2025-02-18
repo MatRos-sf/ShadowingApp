@@ -4,6 +4,8 @@ from kivy.lang.builder import Builder
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 
+from utils.file import DEFAULT_AUDIO_KEEPER
+
 from . import KIVY_FILE
 from .manager_screen import ManagerScreen
 
@@ -27,7 +29,7 @@ class ReadFileScreen(ManagerScreen):
         layout = GridLayout(cols=1, spacing=10, size_hint_y=None)
         layout.bind(minimum_height=layout.setter("height"))
         for row in self.list_of_audio_session:
-            btn = Button(text=str(row.file_path), size_hint_y=None, height=40)
+            btn = Button(text=str(row.name), size_hint_y=None, height=40)
             btn.bind(on_press=self.on_button_click)
             layout.add_widget(btn)
         self.ids.scroll_view.add_widget(layout)
@@ -59,7 +61,7 @@ class ReadFileScreen(ManagerScreen):
         self.ids.chose_file.text = ""
 
     def choose(self):
-        selected_file = Path(self.selected_button.text)
+        selected_file = DEFAULT_AUDIO_KEEPER / Path(self.selected_button.text)
         self.audio_session = next(
             (
                 session
