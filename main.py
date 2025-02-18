@@ -1,5 +1,4 @@
 """Application starting point"""
-from pathlib import Path
 from typing import Optional
 
 from kivy.app import App
@@ -18,7 +17,6 @@ Window.size = (900, 800)
 
 
 class ShadowApp(App):
-    SELECTED_AUDIO_FILE: Optional[Path] = None
     AUDIO_SESSION: Optional[AudioSession] = None
 
     def build(self) -> ScreenManager:

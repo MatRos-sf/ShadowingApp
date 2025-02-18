@@ -7,6 +7,7 @@ from sqlalchemy import select
 
 from models.models import AudioModel
 from models.session_manager import AudioSession, DataBaseSessionManager
+from utils.file import copy_file
 from utils.kivy_extensions import message_box_info
 
 
@@ -25,34 +26,27 @@ class ManagerScreen(Screen):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
 
-    def set_audio_file(self, audio_files: str) -> None:
-        app = App.get_running_app()
-        app.SELECTED_AUDIO_FILE = Path(audio_files)
-        print(type(app.SELECTED_AUDIO_FILE))
-
-    def get_audio_file(self) -> Optional[Path]:  # ? Path | str
-        app = App.get_running_app()
-        return app.SELECTED_AUDIO_FILE
-
-    def set_audio_session(self, audio_session: AudioSession) -> None:
-        app = App.get_running_app()
-        app.AUDIO_SESSION = audio_session
-
-    def get_audio_session(self) -> Optional[AudioSession]:
+    @property
+    def audio_session(self) -> Optional[AudioSession]:
         app = App.get_running_app()
         return app.AUDIO_SESSION
 
+    @audio_session.setter
+    def audio_session(self, audio_session: AudioSession) -> None:
+        app = App.get_running_app()
+        app.AUDIO_SESSION = audio_session
+
+    def get_audio_file(self) -> Optional[Path]:  # ? Path | str
+        app = App.get_running_app()
+        return app.AUDIO_SESSION.file_path if app.AUDIO_SESSION else None
+
     def update_audio_session(self, new_audio_session: AudioSession) -> None:
-        difference = self.get_audio_session().diff(new_audio_session)
-        print(difference)
+        difference = self.audio_session.diff(new_audio_session)
         if difference:
-            self.set_audio_session(new_audio_session)
+            self.audio_session = new_audio_session
             self.update_audio(new_audio_session.id, difference)
 
     def create_audio(self, file_path: Path, *args) -> AudioSession:
-        audio = AudioModel(
-            name=str(file_path.name), file_path=str(file_path), time_stamp=""
-        )
         with DataBaseSessionManager() as session:
             audio = AudioModel(
                 name=str(file_path.name), file_path=str(file_path), time_stamp=""
@@ -62,7 +56,7 @@ class ManagerScreen(Screen):
             return AudioSession(
                 id=audio.id,
                 name=audio.name,
-                file_path=audio.file_path,
+                file_path=Path(audio.file_path),
                 time_stamp=[],
                 spend_time=audio.spend_time,
                 finished_times=audio.finished_times,
@@ -94,6 +88,10 @@ class ManagerScreen(Screen):
     def get_or_create_audio(self, audio_path: Path) -> AudioSession:
         audio = self.find_audio(audio_path.name)
         if audio is None:
+            # copy audio to audio file
+            audio_path = copy_file(audio_path)
+            if not audio_path:
+                raise IOError("Could not create audio")
             audio = self.create_audio(audio_path)
         else:
             message_box_info(
