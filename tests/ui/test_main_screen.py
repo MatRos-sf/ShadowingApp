@@ -48,7 +48,7 @@ class TestMainScreen(unittest.TestCase):
     def test_on_enter_without_audio_file(self, mock_app):
         # mock instance
         mock_instance = MagicMock()
-        mock_instance.SELECTED_AUDIO_FILE = None
+        mock_instance.AUDIO_SESSION = None
         mock_app.return_value = mock_instance
 
         # Call on_enter to update the button state
@@ -63,7 +63,7 @@ class TestMainScreen(unittest.TestCase):
     @patch("kivy.app.App.get_running_app")
     def test_when_button_play_disabled_should_set_info(self, mock_app):
         mock_instance = MagicMock()
-        mock_instance.SELECTED_AUDIO_FILE = Path("/path/to/audio/file.mp3")
+        mock_instance.AUDIO_SESSION.file_path = Path("/path/to/audio/file.mp3")
         mock_app.return_value = mock_instance
 
         self.main_screen.on_enter()
